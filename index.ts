@@ -25,13 +25,25 @@ function readPage(path: string): Promise<string> {
     return readFile(path, {encoding: "utf8"})
 }
 
-function getListings(html: string) {
+interface Listing {
+    title?: string
+    price: string
+}
+
+function toListing(e: Element): Listing {
+    // ".in-card__title" > title or text
+    // ".in-realEstateListCard__features--main" | ".in-feat__item--main" > text
+    return {
+        title: e.querySelector(".in-card__title").getAttribute("title"),
+        price: e.querySelector(".in-feat__item--main").textContent.trim()
+    }
+}
+
+function getListings(html: string): Listing[] {
     let {window} = new JSDOM(html);
-    let selector = ".in-realEstateListCard__features--main";
-    let res = window.document.querySelectorAll(selector);
-    let listings = Array.from(res).map(e => e.textContent).map(t => {
-        price: t
-    });
+    let listing_selector = ".in-realEstateResults__item"
+    let res = window.document.querySelectorAll(listing_selector);
+    let listings = Array.from(res).map(e => toListing(e));
     return listings;
 }
 
