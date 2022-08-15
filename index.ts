@@ -2,7 +2,6 @@ import axios, {AxiosError} from 'axios';
 import {JSDOM} from "jsdom";
 import {readFile} from 'fs/promises';
 
-
 const URL = "https://www.immobiliare.it/vendita-case/roma/" +
     "?criterio=rilevanza" +
     "&prezzoMassimo=500000" +
@@ -56,7 +55,7 @@ function toListing(e: Element): Listing {
     let isPriceStarting = false;
 
     let priceString = e.querySelector(".in-feat__item--main").textContent.trim();
-    if(priceString.toLowerCase().includes("da")) {
+    if (priceString.toLowerCase().includes("da")) {
         let isPriceStarting = true;
         priceString = priceString.replace(/da/i, "").trim()
         priceString = priceString.replace(",00", "");
@@ -103,7 +102,16 @@ function checkDuplicates(listings: Listing[]) {
         console.log(`Duplicate listing ids found! (${listings.length} - ${listingIdsSet.size})`)
     }
 
-    // TODO: print diff
+    let counts = listings.map(l => l.title).reduce((acc, curr) => {
+        return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+    }, new Map<string, number>())
+    counts.forEach((cnt, title, _) => {
+        if (cnt > 1) {
+            // TODO: fix not printing
+            console.log(`${cnt} occurrences: "${title}"`);
+        }
+    })
+
     let listingTitlesSet = new Set(listings.map(l => l.title));
     if (listings.length != listingTitlesSet.size) {
         console.log(`Duplicate listing titles found! (${listings.length} - ${listingTitlesSet.size})`)
@@ -120,9 +128,8 @@ async function run(test: boolean = false): Promise<Listing[]> {
 
     let listings = await fetchAndConvert();
     checkDuplicates(listings);
-    listings.forEach(l => console.log(l.price));
+    // listings.forEach(l => console.log(l.price));
     return listings;
 }
 
 run()
-
