@@ -3,9 +3,9 @@
     "lib": [
       "dom"
     ],
-    "module": "commonjs",
-    "target": "es5",
-    "sourceMap": true
+    "module": "NodeNext",
+    "target": "ES2017",
+    "sourceMap": true,
   },
   "exclude": [
     "node_modules"
